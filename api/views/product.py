@@ -4,7 +4,8 @@ from api.serializers.product import (
     CustomerProductDetailSerializer,
     CustomerProductSerializer,
     ProductSerializer,
-    BulkItemReconcilationApiItemSerializer
+    BulkItemReconcilationApiItemSerializer,
+    EndDayDailyReportSerializer
 )
 from rest_framework.views import APIView
 
@@ -123,19 +124,12 @@ def bulk_product_requisition(request):
 
 from organization.models import EndDayRecord, EndDayDailyReport
 from datetime import date
-class ApiItemReconcilationView(APIView):
+class EndDayView(APIView):
 
     def post(self, request):
-        serializer = BulkItemReconcilationApiItemSerializer(data=request.data)
+        serializer = EndDayDailyReportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        EndDayRecord.objects.create(branch_id = serializer.validated_data.get('branch'),
-                                     terminal=serializer.validated_data.get('terminal'),
-                                     date = serializer.validated_data.get('date')
-                                     )
-        report_total = serializer.validated_data.get("report_total")
-        new_data = {'branch_id':serializer.validated_data.get('branch'),'terminal':serializer.validated_data.get('terminal'), **report_total}
-        EndDayDailyReport.objects.create(**new_data)
         return Response({'details':'success'}, 201)
     
 class CheckAllowReconcilationView(APIView):

@@ -29,6 +29,7 @@ urlpatterns = [
     path("", include("bill.urls")),
     path("", include("discount.urls")),
     path("", include("purchase.urls")),
+    path("", include("order.urls")),
     path("api/", include("api.urls")),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

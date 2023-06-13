@@ -525,9 +525,10 @@ class BillCreate(BillMixin, CreateView):
         form.instance.agent = self.request.user
         form.instance.agent_name = self.request.user.full_name
         form.instance.terminal = 1
+        if self.request.GET.get('order_id', ''):
+            form.instance.order_id = self.request.GET.get('order_id')
         self.object = form.save()
         context = self.get_context_data()
-
         self.save_bill_item_attributes()
         return super().form_valid(form)
 

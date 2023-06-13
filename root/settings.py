@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'django.contrib.humanize',
 ]
-CUSTOM_APPS = ["bill", "organization", "user", "product", "api", "discount", "purchase", "accounting"]
+CUSTOM_APPS = ["bill", "organization", "user", "product", "api", "discount", "purchase", "accounting", "order"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",

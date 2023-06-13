@@ -69,15 +69,6 @@ class Branch(BaseModel):
     def __str__(self):
         return f"{self.organization.org_name} - {self.name} Branch"
 
-    # def save(self, *args, **kwargs):
-    #     unique_id = shortuuid.ShortUUID().random(length=3)
-    #     branch_char_list = [b[0].upper() for b in self.name.split()]
-    #     branch_code = "".join(branch_char_list)
-    #     self.branch_code = f"{branch_code}-{str(unique_id).upper()}"
-    #     super(Branch, self).save(*args, **kwargs)
-
-    # return super().save(*args, **kwargs)
-
 
 class EndDayRecord(BaseModel):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
@@ -86,8 +77,7 @@ class EndDayRecord(BaseModel):
 
     def __str__(self):
         return self.branch.name
-
-
+    
 
 class MailRecipient(models.Model):
     name = models.CharField(max_length=100)
@@ -108,27 +98,17 @@ class MailSendRecord(models.Model):
 
 class EndDayDailyReport(BaseModel):
     employee_name = models.CharField(max_length=50)
-    net_sales = models.FloatField()
+    net_amount = models.FloatField()
+    total_amount = models.FloatField()
     vat = models.FloatField()
     total_discounts = models.FloatField()
-    cash = models.FloatField()
-    credit = models.FloatField()
-    credit_card = models.FloatField()
-    mobile_payment = models.FloatField()
-    complimentary = models.FloatField()
-    start_bill = models.CharField(max_length=20)
-    end_bill = models.CharField(max_length=20)
     date_time = models.CharField(max_length=100, null=True)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True)
-    terminal = models.CharField(max_length=10, null=True)
-    total_sale = models.FloatField(default=0)
+    total_orders = models.IntegerField(default=0)
 
     def __str__(self):
         return 'Report'
     
-    def save(self, *args, **kwargs):
-        self.total_sale = self.net_sales + self.vat
-        return super().save()
 
 from .utils import send_mail_to_receipients
 from threading import Thread
@@ -152,20 +132,13 @@ def create_profile(sender, instance, created, **kwargs):
                 'org_name':org,
                 'date_now': date_now,
                 'time_now': time_now,
-                'total_sale': instance.total_sale,
+                'total_amount': instance.total_amount,
                 'date_time':instance.date_time,
                 'employee_name': instance.employee_name,
-                'net_sales': instance.net_sales,
+                'net_amount': instance.net_amount,
                 'vat': instance.vat,  
                 'total_discounts': instance.total_discounts,
-                'cash': instance.cash,
-                'credit': instance.credit,
-                'credit_card': instance.credit_card,
-                'mobile_payment': instance.mobile_payment,
-                'complimentary': instance.complimentary,
-                'start_bill': instance.start_bill,
-                'end_bill': instance.end_bill,
+                'total_orders': instance.total_orders,
                 'branch': instance.branch.name,
-                'terminal': instance.terminal,
             }
             Thread(target=send_mail_to_receipients, args=(report_data, mail_list, sender)).start()

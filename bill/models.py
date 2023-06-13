@@ -10,7 +10,7 @@ from product.models import Product, ProductStock
 from root.utils import BaseModel
 from django.db.models.signals import post_save
 from .utils import product_sold
-
+from order.models import Order
 
 User = get_user_model()
 
@@ -147,6 +147,7 @@ post_save.connect(update_stock, sender=BillItem)
 """ **************************************** """
 
 class Bill(BaseModel):
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     fiscal_year = models.CharField(max_length=20)
     agent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     agent_name = models.CharField(max_length=255, null=True)
@@ -205,6 +206,10 @@ def create_invoice_number(sender, instance, created, **kwargs):
             pass
         # ___________________________________
 
+        if instance.order:
+            order = instance.order
+            order.bill_generated=True
+            order.save()
         branch = instance.branch.branch_code
         terminal = instance.terminal
 

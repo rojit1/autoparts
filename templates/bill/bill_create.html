@@ -82,7 +82,28 @@
 
 {% block footer_js %}
 <script src="{% static 'js/num2words.js' %}"></script>
+
 <script type="text/javascript">
+
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                resolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
 
 $(document).ready(function() {
    $('#id_').focus();
@@ -145,7 +166,6 @@ $(document).ready(function() {
                 const quantity = 1
                 const {title,price} = data
                 const total = price * quantity
-                console.log(data)
                 new_data=`
                 <tr data-kt-pos-element="item" data-kt-pos-item-price="33" id="id_bill_item_${id}">
                   <td class="pe-0">
@@ -243,7 +263,40 @@ $(document).ready(function() {
  $('#id_discount_amount').on('input', function() {
      calculatePrices()
   })
-  
+
+
+
+  function getOrderDetails(id){
+    const url = `{% settings_value "HOST_URL" %}/api/order-for-bill/${parseInt(id)}/` 
+    $.ajax({
+      url:url, 
+      type: "GET",
+      success: (res) =>{
+        console.log(res)
+        let parentDiv =  document.getElementById('div-id_product')
+        let checkboxes = parentDiv.querySelectorAll('input[type=checkbox]')
+        for(let i of res){
+          checkboxes.forEach(element => {
+            if(i.id == element.value){
+              element.click()
+            }
+          });
+          waitForElm(`#id_bill_item_rate_${i.id}`).then((elm) => {
+            document.getElementById(`id_bill_item_rate_${i.id}`).value=i.rate
+            document.getElementById(`id_bill_item_quantity_${i.id}`).value=i.quantity
+            let btnEl = document.getElementById(i.id)
+            handleQuantity(btnEl, 'increase')
+            handleQuantity(btnEl, 'decrease')
+          });
+        }
+      }
+    })
+  }
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const orderId = urlParams.get('order_id')
+  getOrderDetails(orderId)
 
 </script>
 {% endblock %}

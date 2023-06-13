@@ -1,0 +1,70 @@
+
+{%extends 'base.html'%}
+{% block pagetitle %}Order List {% endblock %}
+{% block home %} {% url 'order:order_list' %} {% endblock %}
+{% block title %}Order List {% endblock %}
+{% block content %}
+ {% include 'components/title_bar.html' with title=' Order List '  %}
+                <div class="card">
+                    {% comment %}
+                {% include 'components/search_filter.html' with show_terminal="yes"  search_title="Search Order" create_button="New Bill" create_url="order:order_create" %} 
+                    {% endcomment %}
+
+    <div class="card-body pt-0">
+    <!--begin::Table-->
+    <div id="kt_customers_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+      <div class="table-responsive">
+        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="kt_customers_table">
+          <!--begin::Table head-->
+          {%if object_list%}
+          <thead>
+            <!--begin::Table row-->
+            <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+       
+              <th class="min-w-225px sorting" tabindex="0" > Unique Order Id</th>
+              <th class="min-w-10px sorting" tabindex="0" > Agent</th>
+              <th class="min-w-10px sorting" tabindex="0" > Customer</th>
+              <th class="min-w-125px sorting" tabindex="0" > Sub Total</th>
+              <th class="min-w-200px sorting" tabindex="0" > Discount Amount</th>
+              <th class="min-w-50px sorting" tabindex="0" > Taxable AMount</th>
+              <th class="min-w-50px sorting" tabindex="0" > Tax Amount</th>
+              <th class="min-w-50px sorting" tabindex="0" > Grand Total</th>
+            </tr>
+            <!--end::Table row-->
+          </thead>
+          {%endif%}
+          <tbody class="fw-bold text-gray-600">
+
+          {% for object in object_list %}
+             <tr class="odd" id="obj-{{object.pk}}">
+                <td> <a href="{%url 'order:order_detail' object.id%}">  {{object.unique_order_id}} </a></td>
+                <td>{{object.agent.full_name}}</td>
+                <td>{{object.customer.name}}</td>
+                <td>{{object.sub_total}}</td>
+                <td>{{object.discount_amount}}</td>
+                <td>{{object.taxable_amount}}</td>
+                <td>{{object.tax_amount}}</td>
+                <td>{{object.grand_total}}</td>
+             </tr>
+             {%empty%}
+             {% include 'components/empty.html' with  title="Order"%}
+              {% endfor %}
+
+          </tbody>
+          <!--end::Table body-->
+        </table>
+      </div>
+    {%if object_list%}
+      {% include 'pagination.html' %}
+    {%endif%}
+    </div>
+    <!--end::Table-->
+  </div>
+  <!--end::Card body-->
+</div>
+
+<script>
+</script>
+
+{% endblock %}
+

@@ -5,6 +5,8 @@ from .organization import urlpatterns as org_urlpatterns
 from .discount_urls import urlpatterns as discount_urlspatterns
 from .purchaserequisition_api import urlpatterns as purchaserequisition_urlpattern
 from .accounting_urls import urlpatterns as accounting_urlpatterns
+from .order import urlpatterns as order_urlpatterns
 urlpatterns = (
-    [] + user_urlpatterns + product_urlpatterns + bill_urlpatterns + org_urlpatterns+discount_urlspatterns+purchaserequisition_urlpattern+accounting_urlpatterns
+    [] + user_urlpatterns + product_urlpatterns + bill_urlpatterns + org_urlpatterns+discount_urlspatterns+purchaserequisition_urlpattern+
+    accounting_urlpatterns+order_urlpatterns
 )
